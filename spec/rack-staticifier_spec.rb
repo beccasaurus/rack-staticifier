@@ -9,6 +9,7 @@ describe Rack::Staticifier do
   it 'should staticify all requests, by default (in public dir by default)' do
     FileUtils.rm_rf 'public'
     FileUtils.rm_rf 'my/cached/stuff'
+    FileUtils.rm_rf 'foo'
     
     the_app = lambda {|env| [200, {}, ["hello from #{env['PATH_INFO']}"]] }
 
@@ -62,6 +63,30 @@ describe Rack::Staticifier do
     File.file?('public/cache-please.html').should be_true
     File.file?('public/me-too-please.html').should be_true
     File.file?('public/dont-cache-because-response.html').should be_false
+
+    # ... and again ...
+
+    File.file?('foo/dont-cache.html').should be_false
+    File.file?('foo/cache-please.html').should be_false
+    File.file?('foo/me-too-please.html').should be_false
+    File.file?('foo/dont-cache-because-response.html').should be_false
+    
+    app = Rack::Staticifier.new(the_app, :root => 'foo') do |env, response|
+      body = ''
+      response[2].each {|s| body << s }
+
+      should_cache = false if body.include?('hello from /dont-cache-because')
+      should_cache = env['PATH_INFO'].include?('please')
+      should_cache
+    end
+
+    %w( dont-cache cache-please me-too-please dont-cache-because-response ).each do |uri|
+      RackBox.request(app, "/#{uri}.html")
+    end
+    File.file?('foo/dont-cache.html').should be_false
+    File.file?('foo/cache-please.html').should be_true
+    File.file?('foo/me-too-please.html').should be_true
+    File.file?('foo/dont-cache-because-response.html').should be_false
   end
 
   # it 'should be able to configure the directory to save responses in'

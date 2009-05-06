@@ -9,11 +9,12 @@ module Rack #:nodoc:
     # configuration options
     attr_reader :config
 
-    def initialize app, config_options = nil
+    def initialize app, config_options = nil, &block
       @app     = app
       @config = default_config_options
 
       config.merge!(config_options) if config_options
+      config[:cache_if] = block     if block
     end
 
     def call env
