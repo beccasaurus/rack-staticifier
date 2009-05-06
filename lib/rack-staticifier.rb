@@ -7,13 +7,13 @@ module Rack #:nodoc:
     attr_reader :app
 
     # configuration options
-    attr_reader :options
+    attr_reader :config
 
-    def initialize app, options = nil
+    def initialize app, config_options = nil
       @app     = app
-      @options = default_options
+      @config = default_config_options
 
-      @options.merge(options) if options
+      config.merge!(config_options) if config_options
     end
 
     def call env
@@ -24,8 +24,8 @@ module Rack #:nodoc:
 
     private
 
-    def default_options
-      { }
+    def default_config_options
+      { :root => 'public' }
     end
 
     def should_cache_response? env
@@ -34,8 +34,9 @@ module Rack #:nodoc:
 
     def cache_response response, env
       request_path = env['PATH_INFO']
+
       basename     = ::File.basename request_path
-      dirname      = ::File.join 'public', ::File.dirname(request_path)
+      dirname      = ::File.join config[:root], ::File.dirname(request_path) # TODO grab 'public' from the config options
       fullpath     = ::File.join dirname, basename
 
       FileUtils.mkdir_p(dirname)
