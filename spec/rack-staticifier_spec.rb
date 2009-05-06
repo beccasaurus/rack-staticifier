@@ -23,6 +23,8 @@ describe Rack::Staticifier do
 
     File.file?('public/foo.html').should be_true
     File.file?('public/bar.html').should be_true
+
+    File.read('public/foo.html').should == "hello from /foo.html"
   end
 
   it 'should be able to configure the directory to save responses in'
