@@ -18,7 +18,7 @@ module Rack #:nodoc:
 
     def call env
       response = @app.call env
-      cache_response(response, env) if should_cache_response?(env)
+      cache_response(env, response) if should_cache_response?(env, response)
       response
     end
 
@@ -28,11 +28,13 @@ module Rack #:nodoc:
       { :root => 'public' }
     end
 
-    def should_cache_response? env
-      true
+    def should_cache_response? env, response
+      return true unless config.keys.include?(:cache_if) and config[:cache_if].respond_to?(:call)
+      should_cache = config[:cache_if].call(env, response)
+      should_cache
     end
 
-    def cache_response response, env
+    def cache_response env, response
       request_path = env['PATH_INFO']
 
       basename     = ::File.basename request_path
