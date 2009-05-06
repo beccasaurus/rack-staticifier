@@ -20,10 +20,15 @@ module Rack #:nodoc:
       response = @app.call env
 
       # for now, cache all!
-      FileUtils.mkdir_p('public')
       response_string = ''
       response[2].each {|s| response_string << s }
-      ::File.open(::File.join('public', env['PATH_INFO']), 'w'){|f| f << response_string }
+      request_path = env['PATH_INFO']
+      basename     = ::File.basename request_path
+      dirname      = ::File.join 'public', ::File.dirname(request_path)
+      fullpath     = ::File.join dirname, basename
+      puts "FULL PATH => #{ fullpath.inspect }"
+      FileUtils.mkdir_p(dirname)
+      ::File.open(fullpath, 'w'){|f| f << response_string }
 
       response
     end

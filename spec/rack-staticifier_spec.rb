@@ -25,6 +25,14 @@ describe Rack::Staticifier do
     File.file?('public/bar.html').should be_true
 
     File.read('public/foo.html').should == "hello from /foo.html"
+
+    # todo, break this into another example
+
+    File.file?('public/subdir/hello.html').should be_false
+    RackBox.request(app, '/subdir/hello.html')
+    File.file?('public/subdir/hello.html').should be_true
+    File.read('public/subdir/hello.html').should == "hello from /subdir/hello.html"
+
   end
 
   it 'should be able to configure the directory to save responses in'
