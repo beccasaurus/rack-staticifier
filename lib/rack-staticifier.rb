@@ -1,6 +1,31 @@
 module Rack #:nodoc:
 
-  # Rack::Staticifier doco ...
+  # Rack::Staticifier is Rack middleware for staticly caching responses.
+  #
+  # ==== Usage
+  #
+  #    # this will cache ALL responses in a 'cache' directory
+  #    use Rack::Staticifier
+  #  
+  #    # this will cache ALL responses in a 'public/my/cached/stuff' directory
+  #    use Rack::Staticifier, :root => 'public/my/cached/stuff'
+  #  
+  #    # this will only cache requests with 'foo' in the URL
+  #    use Rack::Staticifier do |env, response|
+  #      env['PATH_INFO'].include?('foo')
+  #    end
+  #  
+  #    # this will only cache requests with 'hi' in the response body
+  #    use Rack::Staticifier do |env, response|
+  #      # response is a regular Rack response, eg. [200, {}, ['hi there']]
+  #      body = ''
+  #      response.last.each {|string| body << string }
+  #      body.include?('hi')
+  #    end
+  #  
+  #    # this will only cache requests with 'foo' in the URL (incase you don't want to pass a block)
+  #    use Rack::Staticifier, :cache_if => lambda { |env, response| env['PATH_INFO'].include?('foo') }
+  #
   class Staticifier
 
     # the Rack application
