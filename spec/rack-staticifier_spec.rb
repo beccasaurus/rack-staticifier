@@ -130,5 +130,7 @@ describe Rack::Staticifier do
       File.read("cache/#{uri}.html").should == "hello from /#{uri}.html"
     end
   end
+
+  it 'should be able to customize the name of the cached file (?)'
   
 end

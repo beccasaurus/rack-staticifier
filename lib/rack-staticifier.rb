@@ -69,6 +69,7 @@ module Rack #:nodoc:
       fullpath     = ::File.join dirname, basename
 
       FileUtils.mkdir_p(dirname)
+      puts "caching #{ env['PATH_INFO'] } to #{ fullpath } [#{ response_body(response) }]"
       ::File.open(fullpath, 'w'){|f| f << response_body(response) }
     end
 

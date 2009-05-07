@@ -1,13 +1,16 @@
 #! /usr/bin/env ruby
-%w( rubygems sinatra rack/staticifier ).each {|lib| require lib }
+# %w( rubygems sinatra rack/staticifier ).each {|lib| require lib }
+%w( rubygems sinatra ).each {|lib| require lib }
+require File.dirname(__FILE__) + '/../lib/rack-staticifier'
 
-# sinatra serves out of the public directory by default
-use Rack::Staticifier, :root => 'public' do |env, response|
-  response.first == 200 # only staticly cache 200 responses, meaning /non-existent-page-name should render OK
+use Rack::Staticifier do |env, response|
+  ! File.file?('cache' + env['PATH_INFO'])
 end
 
+set :public, 'cache'
+
 $posts = {
-  'hello-world' => 'Hello World!',
+  'hello-world' => '<html><body>Hello World!</body></html>',
   'hi-there'    => 'Hi from my blog post text'
 }
 
