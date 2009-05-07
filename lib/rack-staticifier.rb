@@ -62,6 +62,7 @@ module Rack #:nodoc:
 
     def cache_response env, response
       request_path = env['PATH_INFO']
+      request_path << 'index.html' if request_path.end_with?('/')
 
       basename     = ::File.basename request_path
       dirname      = ::File.join config[:root], ::File.dirname(request_path) # TODO grab 'public' from the config options

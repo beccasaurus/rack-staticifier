@@ -15,6 +15,23 @@ describe Rack::Staticifier do
     %w( public cache foo ).each {|dir| FileUtils.rm_rf dir } # clean up!
   end
 
+  it 'should render index.html for any requests ending in a slash' do
+    app = Rack::Staticifier.new @app
+
+    # for the '/' route
+    File.file?("cache/index.html").should be_false
+    RackBox.request app, "/"
+    File.file?("cache/index.html").should be_true
+    File.read("cache/index.html").should == "hello from /"
+
+    %w( foo/ bar/ ).each do |uri|
+      File.file?("cache/#{uri}index.html").should be_false
+      RackBox.request app, "/#{uri}"
+      File.file?("cache/#{uri}index.html").should be_true
+      File.read("cache/#{uri}index.html").should == "hello from /#{uri}"
+    end
+  end
+
   it 'should cache all requests by default (in cache directory)' do
     app = Rack::Staticifier.new @app
 
