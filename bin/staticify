@@ -14,8 +14,18 @@ require File.dirname(__FILE__) + '/../lib/rack-staticifier'
 
 def usage
   puts <<USAGE
-  foo!
+  staticify == %{ For staticifying your Rack applications }
+
+    Usage:
+      staticify        # print this usage information
+      staticify .      # staticify Rack app in current directory
+
 USAGE
+end
+
+if ARGV.empty?
+  usage
+  exit
 end
 
 #### ==== Option Parsing ==== ####
@@ -27,9 +37,17 @@ path_to_cache_to = '.site'
 opts = OptionParser.new do |opts|
   opts.on('-r', '--require [file]') {|x| files_to_require << x }
   opts.on('-a', '--app [ruby]')     {|x| ruby_to_run = x       }
-  opts.on('-p', '--path [path]')    {|x| path_to_cache_to = x  }
+  opts.on('-d', '--dir [dir]')      {|x| path_to_cache_to = x  }
 end
 opts.parse! ARGV
+
+app_directory = ARGV.shift
+unless File.directory? app_directory
+   puts "App directory not found: #{ app_directory }\n\n"
+   usage
+   exit
+end
+FileUtils.cd app_directory
 
 files_to_require.each {|file| require file }
 if ruby_to_run
@@ -42,8 +60,7 @@ if ruby_to_run
 end
 
 unless RackBox.app(:silent => true)
-  puts "Cannot find your Rack application"
-  puts ""
+  puts "Cannot find your Rack application\n\n"
   usage
   exit
 end
