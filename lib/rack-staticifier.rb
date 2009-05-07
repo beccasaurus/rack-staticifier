@@ -70,11 +70,10 @@ module Rack #:nodoc:
       request_path << 'index.html' if request_path.end_with?('/')
 
       basename     = ::File.basename request_path
-      dirname      = ::File.join config[:root], ::File.dirname(request_path) # TODO grab 'public' from the config options
+      dirname      = ::File.join config[:root], ::File.dirname(request_path)
       fullpath     = ::File.join dirname, basename
 
       FileUtils.mkdir_p(dirname)
-      puts "caching #{ env['PATH_INFO'] } to #{ fullpath } [#{ response_body(response) }]"
       ::File.open(fullpath, 'w'){|f| f << response_body(response) }
     end
 
