@@ -9,10 +9,10 @@ begin
   require 'jeweler'
   Jeweler::Tasks.new do |s|
     s.name        = 'rack-staticifier'
-    s.summary     = ''
+    s.summary     = 'Staticly cache requests to any Rack application'
     s.email       = 'remi@remitaylor.com'
     s.homepage    = 'http://github.com/remi/rack-staticifier'
-    s.description = ''
+    s.description = 'Staticly cache requests to any Rack application - perfect for creating static sites/blogs/etc!'
     s.authors     = %w( remi )
     s.files       = FileList['[A-Z]*', '{lib,spec,bin,examples}/**/*'] 
     s.add_dependency 'remi-rackbox'

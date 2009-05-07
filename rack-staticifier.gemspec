@@ -8,7 +8,7 @@ Gem::Specification.new do |s|
   s.authors = ["remi"]
   s.date = %q{2009-05-07}
   s.default_executable = %q{staticify}
-  s.description = %q{}
+  s.description = %q{Staticly cache requests to any Rack application - perfect for creating static sites/blogs/etc!}
   s.email = %q{remi@remitaylor.com}
   s.executables = ["staticify"]
   s.files = ["Rakefile", "VERSION.yml", "README.rdoc", "lib/rack-staticifier.rb", "lib/rack", "lib/rack/staticifier.rb", "spec/rack-staticifier_spec.rb", "bin/staticify", "examples/sinatra-blog-with-built-in-caching", "examples/sinatra-blog-with-built-in-caching/my-sinatra-blog.rb", "examples/blog-to-staticify", "examples/blog-to-staticify/posts", "examples/blog-to-staticify/posts/first.mkd", "examples/blog-to-staticify/posts/second.mkd", "examples/blog-to-staticify/my-blog.rb", "examples/blog-to-staticify/config.ru", "examples/blog-to-staticify/paths-to-cache"]
@@ -17,7 +17,7 @@ Gem::Specification.new do |s|
   s.rdoc_options = ["--inline-source", "--charset=UTF-8"]
   s.require_paths = ["lib"]
   s.rubygems_version = %q{1.3.1}
-  s.summary = %q{}
+  s.summary = %q{Staticly cache requests to any Rack application}
 
   if s.respond_to? :specification_version then
     current_version = Gem::Specification::CURRENT_SPECIFICATION_VERSION
