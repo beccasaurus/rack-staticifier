@@ -6,93 +6,108 @@ require File.dirname(__FILE__) + '/../lib/rack-staticifier'
 
 describe Rack::Staticifier do
 
-  it 'should staticify all requests, by default (in public dir by default)' do
-    FileUtils.rm_rf 'public'
-    FileUtils.rm_rf 'my/cached/stuff'
-    FileUtils.rm_rf 'foo'
-    
-    the_app = lambda {|env| [200, {}, ["hello from #{env['PATH_INFO']}"]] }
-
-    # use Rack::Staticifier
-
-    app = Rack::Staticifier.new the_app
-
-    File.file?('public/foo.html').should be_false
-    File.file?('public/bar.html').should be_false
-
-    RackBox.request(app, '/foo.html')
-    RackBox.request(app, '/bar.html')
-
-    File.file?('public/foo.html').should be_true
-    File.file?('public/bar.html').should be_true
-
-    File.read('public/foo.html').should == "hello from /foo.html"
-
-    # todo, break this into another example
-
-    File.file?('public/subdir/hello.html').should be_false
-    RackBox.request(app, '/subdir/hello.html')
-    File.file?('public/subdir/hello.html').should be_true
-    File.read('public/subdir/hello.html').should == "hello from /subdir/hello.html"
-
-    # again, break this out!  configure directory ...
-
-    File.file?('my/cached/stuff/subdir/hello.html').should be_false
-    app = Rack::Staticifier.new the_app, :root => 'my/cached/stuff'
-    RackBox.request(app, '/subdir/hello.html')
-    File.file?('my/cached/stuff/subdir/hello.html').should be_true
-    File.read('my/cached/stuff/subdir/hello.html').should == "hello from /subdir/hello.html"
-
-    # ... and again ...
-
-    File.file?('public/dont-cache.html').should be_false
-    File.file?('public/cache-please.html').should be_false
-    File.file?('public/me-too-please.html').should be_false
-    File.file?('public/dont-cache-because-response.html').should be_false
-    app = Rack::Staticifier.new the_app, :cache_if => lambda {|env, response|
-      body = ''
-      response[2].each {|s| body << s }
-
-      return false if body.include?('hello from /dont-cache-because')
-      return env['PATH_INFO'].include?('please')
-    }
-    %w( dont-cache cache-please me-too-please dont-cache-because-response ).each do |uri|
-      RackBox.request(app, "/#{uri}.html")
-    end
-    File.file?('public/dont-cache.html').should be_false
-    File.file?('public/cache-please.html').should be_true
-    File.file?('public/me-too-please.html').should be_true
-    File.file?('public/dont-cache-because-response.html').should be_false
-
-    # ... and again ...
-
-    File.file?('foo/dont-cache.html').should be_false
-    File.file?('foo/cache-please.html').should be_false
-    File.file?('foo/me-too-please.html').should be_false
-    File.file?('foo/dont-cache-because-response.html').should be_false
-    
-    app = Rack::Staticifier.new(the_app, :root => 'foo') do |env, response|
-      body = ''
-      response[2].each {|s| body << s }
-
-      should_cache = false if body.include?('hello from /dont-cache-because')
-      should_cache = env['PATH_INFO'].include?('please')
-      should_cache
-    end
-
-    %w( dont-cache cache-please me-too-please dont-cache-because-response ).each do |uri|
-      RackBox.request(app, "/#{uri}.html")
-    end
-    File.file?('foo/dont-cache.html').should be_false
-    File.file?('foo/cache-please.html').should be_true
-    File.file?('foo/me-too-please.html').should be_true
-    File.file?('foo/dont-cache-because-response.html').should be_false
+  before do
+    %w( public cache foo ).each {|dir| FileUtils.rm_rf dir }
+    @app = lambda {|env| [200, {}, ["hello from #{env['PATH_INFO']}"]] }
   end
 
-  # it 'should be able to configure the directory to save responses in'
-  
-  # it 'should be able to pass a block that will be called to determine paths to staticify (staticify if returns true for env)'
+  it 'should cache all requests by default (in cache directory)' do
+    app = Rack::Staticifier.new @app
 
-  ### it 'should be able to pass regular expression(s) for paths to staticify'
+    %w( foo bar ).each do |uri|
+      File.file?("cache/#{uri}.html").should be_false
+      RackBox.request app, "/#{uri}.html"
+      File.file?("cache/#{uri}.html").should be_true
+      File.read("cache/#{uri}.html").should == "hello from /#{uri}.html"
+    end
+  end
+
+  it 'should cache all requests in a custom directory' do
+    app = Rack::Staticifier.new @app, :root => 'foo'
+
+    %w( foo bar ).each do |uri|
+      File.file?("foo/#{uri}.html").should be_false
+      RackBox.request app, "/#{uri}.html"
+      File.file?("foo/#{uri}.html").should be_true
+      File.read("foo/#{uri}.html").should == "hello from /#{uri}.html"
+    end
+  end
+
+  it 'should cache all requests in a custom subdirectory' do
+    app = Rack::Staticifier.new @app, :root => 'foo/bar'
+
+    %w( foo bar ).each do |uri|
+      File.file?("foo/bar/#{uri}.html").should be_false
+      RackBox.request app, "/#{uri}.html"
+      File.file?("foo/bar/#{uri}.html").should be_true
+      File.read("foo/bar/#{uri}.html").should == "hello from /#{uri}.html"
+    end
+  end
+
+  it 'should cache requests with slashes in them (create subdirectories)' do
+    app = Rack::Staticifier.new @app, :root => 'foo'
+
+    %w( hi/there a/b/c/1/2/3 totally/neato ).each do |uri|
+      File.file?("foo/#{uri}.html").should be_false
+      RackBox.request app, "/#{uri}.html"
+      File.file?("foo/#{uri}.html").should be_true
+      File.read("foo/#{uri}.html").should == "hello from /#{uri}.html"
+    end
+  end
+
+  it 'should be able to only cache requests based on request environment' do
+    app = Rack::Staticifier.new @app, :cache_if => lambda {|env,resp| env['PATH_INFO'].include?('cache') }
+
+    %w( hi there crazy/person ).each do |uri|
+      File.file?("cache/#{uri}.html").should be_false
+      RackBox.request app, "/#{uri}.html"
+      File.file?("cache/#{uri}.html").should be_false
+    end
+
+    %w( cache cache-me please/cache/me ).each do |uri|
+      File.file?("cache/#{uri}.html").should be_false
+      RackBox.request app, "/#{uri}.html"
+      File.file?("cache/#{uri}.html").should be_true
+      File.read("cache/#{uri}.html").should == "hello from /#{uri}.html"
+    end
+  end
+
+  it 'should be able to only cache requests based on request environment (by passing a block)' do
+    app = Rack::Staticifier.new(@app){ |env,resp| env['PATH_INFO'].include?('cache') }
+
+    %w( hi there crazy/person ).each do |uri|
+      File.file?("cache/#{uri}.html").should be_false
+      RackBox.request app, "/#{uri}.html"
+      File.file?("cache/#{uri}.html").should be_false
+    end
+
+    %w( cache cache-me please/cache/me ).each do |uri|
+      File.file?("cache/#{uri}.html").should be_false
+      RackBox.request app, "/#{uri}.html"
+      File.file?("cache/#{uri}.html").should be_true
+      File.read("cache/#{uri}.html").should == "hello from /#{uri}.html"
+    end
+  end
+
+  it 'should be able to only cache requests based on generated response' do
+    app = Rack::Staticifier.new @app, :cache_if => lambda {|env,resp|
+      body = ''
+      resp[2].each {|s| body << s }
+      body.include?("hello from /foo")
+    }
+
+    %w( nope hi not/start/with/foo/x nor-me-foo ).each do |uri|
+      File.file?("cache/#{uri}.html").should be_false
+      RackBox.request app, "/#{uri}.html"
+      File.file?("cache/#{uri}.html").should be_false
+    end
+
+    %w( foo fooooo foo/bar ).each do |uri|
+      File.file?("cache/#{uri}.html").should be_false
+      RackBox.request app, "/#{uri}.html"
+      File.file?("cache/#{uri}.html").should be_true
+      File.read("cache/#{uri}.html").should == "hello from /#{uri}.html"
+    end
+  end
   
 end

@@ -26,7 +26,7 @@ module Rack #:nodoc:
     private
 
     def default_config_options
-      { :root => 'public' }
+      { :root => 'cache' }
     end
 
     def should_cache_response? env, response
