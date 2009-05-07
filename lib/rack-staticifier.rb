@@ -28,6 +28,8 @@ module Rack #:nodoc:
   #
   class Staticifier
 
+    STATUS_CODES_NOT_TO_CACHE = [ 304 ]
+
     # the Rack application
     attr_reader :app
 
@@ -35,7 +37,7 @@ module Rack #:nodoc:
     attr_reader :config
 
     def initialize app, config_options = nil, &block
-      @app     = app
+      @app    = app
       @config = default_config_options
 
       config.merge!(config_options) if config_options
@@ -55,7 +57,10 @@ module Rack #:nodoc:
     end
 
     def should_cache_response? env, response
-      return true unless config.keys.include?(:cache_if) and config[:cache_if].respond_to?(:call)
+      return false if STATUS_CODES_NOT_TO_CACHE.include?(response.first) # there are certain HTTP Status Codes we should never cache
+      return false if response.last.respond_to?(:to_path) # we don't cache Rack::File's
+      return true unless config.keys.include?(:cache_if) and config[:cache_if].respond_to?(:call) # true if no cache_if / block
+
       should_cache = config[:cache_if].call(env, response)
       should_cache
     end

@@ -3,9 +3,7 @@
 %w( rubygems sinatra ).each {|lib| require lib }
 require File.dirname(__FILE__) + '/../lib/rack-staticifier'
 
-use Rack::Staticifier do |env, response|
-  ! File.file?('cache' + env['PATH_INFO'])
-end
+use Rack::Staticifier
 
 set :public, 'cache'
 
