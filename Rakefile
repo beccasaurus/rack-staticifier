@@ -15,8 +15,8 @@ begin
     s.description = ''
     s.authors     = %w( remi )
     s.files       = FileList['[A-Z]*', '{lib,spec,bin,examples}/**/*'] 
-    # s.add_dependency 'person-gemname'
-    # s.executables << 'script'
+    s.add_dependency 'remi-rackbox'
+    s.executables << 'staticify'
     # s.rubyforge_project = 'gemname'
     # s.extra_rdoc_files = %w( README.rdoc )
   end

@@ -20,6 +20,11 @@ def usage
       staticify        # print this usage information
       staticify .      # staticify Rack app in current directory
 
+    Options:
+      -d, --dir some/directory   # directory to save files to
+      -a, --app "MyApp.new"      # ruby to eval to get Rack app
+      -r, --require file[.rb]    # ruby file(s) to require
+
 USAGE
 end
 
