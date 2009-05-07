@@ -11,6 +11,10 @@ describe Rack::Staticifier do
     @app = lambda {|env| [200, {}, ["hello from #{env['PATH_INFO']}"]] }
   end
 
+  after :all do
+    %w( public cache foo ).each {|dir| FileUtils.rm_rf dir } # clean up!
+  end
+
   it 'should cache all requests by default (in cache directory)' do
     app = Rack::Staticifier.new @app
 
