@@ -2,14 +2,14 @@
 
 Gem::Specification.new do |s|
   s.name = %q{rack-staticifier}
-  s.version = "0.1.2"
+  s.version = "0.1.3"
 
   s.required_rubygems_version = Gem::Requirement.new(">= 0") if s.respond_to? :required_rubygems_version=
   s.authors = ["remi"]
-  s.date = %q{2009-05-06}
+  s.date = %q{2009-05-07}
   s.description = %q{}
   s.email = %q{remi@remitaylor.com}
-  s.files = ["Rakefile", "VERSION.yml", "README.rdoc", "lib/rack-staticifier.rb", "lib/rack", "lib/rack/staticifier.rb", "spec/rack-staticifier_spec.rb", "examples/cache", "examples/cache/abcfdjskjfdsdefg.html", "examples/cache/abcdefg.html", "examples/my-sinatra-blog.rb"]
+  s.files = ["Rakefile", "VERSION.yml", "README.rdoc", "lib/rack-staticifier.rb", "lib/rack", "lib/rack/staticifier.rb", "spec/rack-staticifier_spec.rb", "bin/staticify", "examples/sinatra-blog-with-built-in-caching", "examples/sinatra-blog-with-built-in-caching/my-sinatra-blog.rb", "examples/blog-to-staticify", "examples/blog-to-staticify/posts", "examples/blog-to-staticify/posts/first.mkd", "examples/blog-to-staticify/posts/second.mkd", "examples/blog-to-staticify/my-blog.rb", "examples/blog-to-staticify/config.ru", "examples/blog-to-staticify/paths-to-cache"]
   s.has_rdoc = true
   s.homepage = %q{http://github.com/remi/rack-staticifier}
   s.rdoc_options = ["--inline-source", "--charset=UTF-8"]
