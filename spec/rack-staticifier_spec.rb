@@ -131,6 +131,8 @@ describe Rack::Staticifier do
     end
   end
 
+  it 'should handle when a body is a Rack::File instead of a string body (#each)'
+
   it 'should be able to customize the name of the cached file (?)'
   
 end
