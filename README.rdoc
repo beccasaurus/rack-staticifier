@@ -9,6 +9,8 @@ Rack::Staticifier is Rack middleware for staticly caching responses.
 
 == Usage
 
+  require 'rack/staticifier'
+
   # this will cache ALL responses in a 'cache' directory
   use Rack::Staticifier
 
