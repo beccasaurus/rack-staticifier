@@ -32,3 +32,7 @@ Rack::Staticifier is Rack middleware for staticly caching responses.
 
   # this will only cache requests with 'foo' in the URL (incase you don't want to pass a block)
   use Rack::Staticifier, :cache_if => lambda { |env, response| env['PATH_INFO'].include?('foo') }
+
+== TODO
+
+* compare to Rack::ResponseCache (in rack-contrib) ... maybe that can replace this, or vice-versa?
